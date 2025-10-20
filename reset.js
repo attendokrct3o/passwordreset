@@ -1,6 +1,21 @@
-// This script expects the access_token in the URL hash
+// This script supports both access_token in hash and confirmation param in query string
 const form = document.getElementById('resetForm');
 const message = document.getElementById('message');
+
+function getToken() {
+  // 1. Try access_token in hash
+  const hashToken = window.location.hash.match(/access_token=([^&]+)/)?.[1];
+  if (hashToken) return hashToken;
+  // 2. Try confirmation param in query string (for custom redirect)
+  const urlParams = new URLSearchParams(window.location.search);
+  const confirmationUrl = urlParams.get('confirmation');
+  if (confirmationUrl) {
+    // Extract access_token from confirmation URL
+    const match = confirmationUrl.match(/access_token=([^&]+)/);
+    if (match) return match[1];
+  }
+  return null;
+}
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -15,8 +30,8 @@ form.addEventListener('submit', async (e) => {
     message.textContent = 'Passwords do not match.';
     return;
   }
-  // Get access_token from URL hash
-  const token = window.location.hash.match(/access_token=([^&]+)/)?.[1];
+  // Get token from hash or query param
+  const token = getToken();
   if (!token) {
     message.textContent = 'Invalid or missing token.';
     return;
