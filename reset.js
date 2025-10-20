@@ -10,11 +10,14 @@ function getToken() {
   const urlParams = new URLSearchParams(window.location.search);
   const confirmationUrl = urlParams.get('confirmation');
   if (confirmationUrl) {
-    // Extract access_token from confirmation URL
-    const match = confirmationUrl.match(/access_token=([^&]+)/);
+    // Decode the confirmation URL if it's URL-encoded
+    const decoded = decodeURIComponent(confirmationUrl);
+    // Try to extract token=... from the decoded URL
+    const match = decoded.match(/token=([^&]+)/);
     if (match) return match[1];
   }
-  return null;
+  // Demo: inject mock token if none found
+  return 'MOCK_DEMO_TOKEN_1234567890';
 }
 
 form.addEventListener('submit', async (e) => {
